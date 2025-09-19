@@ -1,0 +1,225 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  username          String   @unique
+  firstName         String
+  lastName          String
+  bio               String?
+  avatar            String?
+  coverPhoto        String?
+  dateOfBirth       DateTime?
+  location          String?
+  website           String?
+  isVerified        Boolean  @default(false)
+  isPrivate         Boolean  @default(false)
+  passwordHash      String
+  emailVerified     Boolean  @default(false)
+  emailVerifiedAt   DateTime?
+  lastLogin         DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Posts relationship
+  posts             Post[]
+
+  // Social relationships
+  following         Follow[] @relation("UserFollowing")
+  followers         Follow[] @relation("UserFollowers")
+
+  // Interactions
+  likes             Like[]
+  comments          Comment[]
+
+  // Messaging
+  sentMessages      Message[] @relation("MessageSender")
+  receivedMessages  Message[] @relation("MessageReceiver")
+
+  // Group memberships
+  groupMemberships  GroupMember[]
+
+  // Notifications
+  notifications     Notification[] @relation("NotificationRecipient")
+  triggeredNotifications Notification[] @relation("NotificationTriggerer")
+
+  @@map("users")
+}
+
+model Post {
+  id          String      @id @default(cuid())
+  content     String?
+  mediaUrls   String[]
+  mediaTypes  MediaType[] @default([])
+  visibility  Visibility  @default(PUBLIC)
+  location    String?
+  tags        String[]
+  authorId    String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  author      User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes       Like[]
+  comments    Comment[]
+  shares      Share[]
+
+  @@map("posts")
+}
+
+model Like {
+  id      String @id @default(cuid())
+  userId  String
+  postId  String
+  createdAt DateTime @default(now())
+
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("likes")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  postId    String
+  parentId  String?  // For nested comments
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+
+  @@map("comments")
+}
+
+model Share {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  comment   String?  // Optional comment when sharing
+  createdAt DateTime @default(now())
+
+  // Note: User relationship would be here if we had a User model
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("shares")
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower    User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model Message {
+  id         String      @id @default(cuid())
+  content    String
+  senderId   String
+  receiverId String
+  mediaUrl   String?
+  mediaType  MediaType?
+  isRead     Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+
+  sender     User @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Group {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  avatar      String?
+  coverPhoto  String?
+  isPrivate   Boolean       @default(false)
+  createdById String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  members     GroupMember[]
+
+  @@map("groups")
+}
+
+model GroupMember {
+  id      String    @id @default(cuid())
+  userId  String
+  groupId String
+  role    GroupRole @default(MEMBER)
+  joinedAt DateTime @default(now())
+
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group   Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+  @@map("group_members")
+}
+
+model Notification {
+  id            String           @id @default(cuid())
+  type          NotificationType
+  message       String
+  isRead        Boolean          @default(false)
+  recipientId   String
+  triggererId   String?          // User who triggered the notification
+  relatedId     String?          // ID of related post, comment, etc.
+  createdAt     DateTime         @default(now())
+
+  recipient     User @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  triggerer     User? @relation("NotificationTriggerer", fields: [triggererId], references: [id], onDelete: SetNull)
+
+  @@map("notifications")
+}
+
+enum Visibility {
+  PUBLIC
+  FRIENDS
+  PRIVATE
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+}
+
+enum GroupRole {
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  MENTION
+  MESSAGE
+  GROUP_INVITE
+  GROUP_JOIN
+}
