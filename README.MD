@@ -142,7 +142,7 @@ Ensure you have these installed:
 
 ```bash
 # Clone and setup everything
-git clone https://github.com/nirwolff/socialer.git && cd socialer && npm install && cp .env.example .env && npm run db:migrate && npm run db:seed && npm run dev
+git clone https://github.com/nirwo/Socializer.git && cd Socializer && npm install && cp .env.example .env && npm run db:migrate && npm run db:seed && npm run dev
 ```
 
 ### 📋 Step-by-Step Setup
@@ -152,8 +152,8 @@ git clone https://github.com/nirwolff/socialer.git && cd socialer && npm install
 
 #### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/nirwolff/socialer.git
-cd socialer
+git clone https://github.com/nirwo/Socializer.git
+cd Socializer
 ```
 
 #### 2️⃣ Install Dependencies
@@ -387,8 +387,8 @@ We love contributions! Whether it's bug fixes, new features, or documentation im
 
 ```bash
 # 1. Fork & Clone
-git clone https://github.com/YOUR_USERNAME/socialer.git
-cd socialer
+git clone https://github.com/YOUR_USERNAME/Socializer.git
+cd Socializer
 
 # 2. Create feature branch
 git checkout -b feature/awesome-feature
@@ -785,11 +785,11 @@ node --version  # Should be 18+
 
 ### 💬 Get Help
 
-- 📖 **[Documentation](https://docs.socialer.com)** - Comprehensive guides and API reference
-- 🐛 **[GitHub Issues](https://github.com/nirwolff/socialer/issues)** - Bug reports and feature requests  
-- 💡 **[GitHub Discussions](https://github.com/nirwolff/socialer/discussions)** - Community Q&A
-- 💬 **[Discord Server](https://discord.gg/socialer)** - Real-time community chat
-- 📧 **[Email Support](mailto:support@socialer.com)** - Direct technical support
+- 📖 **[Documentation](https://docs.socializer.com)** - Comprehensive guides and API reference
+- 🐛 **[GitHub Issues](https://github.com/nirwo/Socializer/issues)** - Bug reports and feature requests  
+- 💡 **[GitHub Discussions](https://github.com/nirwo/Socializer/discussions)** - Community Q&A
+- 💬 **[Discord Server](https://discord.gg/socializer)** - Real-time community chat
+- 📧 **[Email Support](mailto:support@socializer.com)** - Direct technical support
 
 ### 🌟 Stay Updated
 
